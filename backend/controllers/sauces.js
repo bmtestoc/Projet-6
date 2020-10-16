@@ -116,13 +116,24 @@ async.waterfall ([
   // Vérification si user déjà présent dans tableau usersLiked ou tableau usersDisliked
   function(sauceFound, userFound, done) {
     if(userFound) {
-      Sauce.findOne({
-        userId: req.body.usersLiked || req.body.usersDisliked
-      }).then (
-        function(alreadyLikedOrDisliked) {
-          done(null, sauceFound, userFound, alreadyLikedOrDisliked);
-        }
-      )
+      const idUserInLikes = sauceFound.usersLiked.includes(userFound._id);
+      const idUserInDislikes = sauceFound.usersDisliked.includes(userFound._id);
+      /*console.log(sauceFound);
+      console.log(idUserInLikes);
+      console.log(idUserInDislikes);*/
+      if(idUserInLikes == true) {
+        const currentLikes = sauceFound.likes;
+        const newLikes = currentLikes - 1;
+        const currentUsersLiked = sauceFound.usersLiked;
+        //console.log(currentUsersLiked);
+
+        const indexUser = currentUsersLiked.indexOf(userFound._id);
+        currentUsersLiked.splice(indexUser, 1);
+        //console.log(currentUsersLiked);
+// RESTE UPDATE DE LA SAUCE
+      } else if(idUserInDislikes == true) {
+
+      }
     }
   }
 
