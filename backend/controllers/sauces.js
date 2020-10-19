@@ -118,24 +118,58 @@ async.waterfall ([
     if(userFound) {
       const idUserInLikes = sauceFound.usersLiked.includes(userFound._id);
       const idUserInDislikes = sauceFound.usersDisliked.includes(userFound._id);
-      /*console.log(sauceFound);
-      console.log(idUserInLikes);
-      console.log(idUserInDislikes);*/
+      let sauceUpdate = {};
       if(idUserInLikes == true) {
         const currentLikes = sauceFound.likes;
         const newLikes = currentLikes - 1;
-        const currentUsersLiked = sauceFound.usersLiked;
-        //console.log(currentUsersLiked);
-
+        let currentUsersLiked = sauceFound.usersLiked;
         const indexUser = currentUsersLiked.indexOf(userFound._id);
         currentUsersLiked.splice(indexUser, 1);
-        //console.log(currentUsersLiked);
-// RESTE UPDATE DE LA SAUCE
+        sauceUpdate = {
+          usersLiked: currentUsersLiked,
+          likes: newLikes
+        }
       } else if(idUserInDislikes == true) {
-
+        const currentDislikes = sauceFound.dislikes;
+        const newDislikes = currentDislikes - 1;
+        let currentUsersDisliked = sauceFound.usersDisliked;
+        const indexUser = currentUsersDisliked.indexOf(userFound._id);
+        currentUsersDisliked.splice(indexUser, 1);
+        sauceUpdate = {
+          usersDisliked: currentUsersDisliked,
+          dislikes: newDislikes
+        }
       }
+      // Si user trouvé dans tableau usersLiked ou tableau usersDisliked : annulation du vote
+      Sauce.updateOne({ _id: sauceFound._id }, sauceUpdate)
+      .then (
+        function(updatedSauce) {
+          done(null, sauceFound, userFound, updatedSauce);
+        }
+      )
+      .catch(function(err) {
+        return res.status(500).json({error: 'Erreur lors de l\'annulation'})
+      });
     }
-  }
+  },
+  // 
+  function(sauceFound, userFound, updatedSauce, done) {
+    //console.log(sauceFound);
+    //console.log(userFound);
+    console.log(updatedSauce);
+
+    /*if(sauceFound) {
+      User.findOne({
+        _id: req.body.userId
+      }).then (
+        function(userFound) {
+          done(null, sauceFound, userFound);
+        }
+      ).catch(function(err) {
+        return res.status(500).json({error: 'Utilisateur non trouvé'})
+      });
+    }*/
+  },  
 
 
 ]
