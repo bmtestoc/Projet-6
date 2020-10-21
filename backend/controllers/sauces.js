@@ -14,7 +14,7 @@ exports.createSauce = (req, res, next) => {
   sauce.save().then(
     () => {
       res.status(201).json({
-        message: 'Sauce ajoutée avec succès !'
+        message: 'Sauce ajoutée avec succès'
       });
     }
   ).catch(
@@ -34,7 +34,7 @@ exports.modifySauce = (req, res, next) => {
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
   Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Objet modifié !' }))
+    .then(() => res.status(200).json({ message: 'Sauce modifiée' }))
     .catch(error => res.status(400).json({ error }));
 };
 
@@ -45,7 +45,7 @@ exports.deleteSauce = (req, res, next) => {
       const filename = sauce.imageUrl.split('/images/')[1];
       fs.unlink(`images/${filename}`, () => {
         Sauce.deleteOne({ _id: req.params.id })
-          .then(() => res.status(200).json({ message: 'Objet supprimé !' }))
+          .then(() => res.status(200).json({ message: 'Sauce supprimée' }))
           .catch(error => res.status(400).json({ error }));
       });
     })
@@ -152,26 +152,24 @@ exports.likeSauce = (req, res, next) => {
           });
       }
     },
-    // 
+    // Prise en compte du vote
     function (sauceFound, userFound, updatedSauce, done) {
-      //console.log(sauceFound);
-      //console.log(userFound);
-      //console.log(updatedSauce);
-      //console.log(req.body.like);
       const valueLike = req.body.like;
+      // Valeur 0 = annulation du vote
       if (valueLike === 0) {
         res.status(200).json({ result: 'Votre vote a été annulé' })
       }
+      // Valeur 1 ou -1
       if (updatedSauce && valueLike != 0) {
         Sauce.findOne({
           _id: req.params.id
         }, function (err, newSauceFound) {
-          //console.log(newSauceFound); 
           let addVote = {};
           let numberLikes = newSauceFound.likes;
           let numberDislikes = newSauceFound.dislikes;
           let usersLikes = newSauceFound.usersLiked;
           let usersDislikes = newSauceFound.usersDisliked;
+          // Valeur 1 = vote like (ajoute: 1 vote au compteur like et l'utilisateur dans le tableau usersLiked)
           if (valueLike === 1) {
             numberLikes = numberLikes + 1;
             usersLikes.push(userFound._id);
@@ -179,6 +177,7 @@ exports.likeSauce = (req, res, next) => {
               likes: numberLikes,
               usersLiked: usersLikes
             }
+            // Valeur -1 = vote dislike (ajoute: 1 vote au compteur dislike et l'utilisateur dans le tableau usersDisliked)
           } else if (valueLike === -1) {
             numberDislikes = numberDislikes + 1;
             usersDislikes.push(userFound._id);
@@ -187,33 +186,20 @@ exports.likeSauce = (req, res, next) => {
               usersDisliked: usersDislikes
             }
           }
-          //console.log(addVote);
-          // 
+          // Mise à jour de la sauce
           Sauce.updateOne({ _id: sauceFound._id }, addVote)
-          .then(
-            function (newUpdatedSauce) {
-              done(newUpdatedSauce);
-            }
-          )
-          .catch(function (err) {
-            return res.status(500).json({ error: 'Erreur lors de la mise à jour' })
-          });
+            .then(
+              function (newUpdatedSauce) {
+                done(newUpdatedSauce);
+              }
+            )
+            .catch(function (err) {
+              return res.status(500).json({ error: 'Erreur lors de la mise à jour' })
+            });
         });
-
-
       }
-
-
-
-
-
     },
-
-
-  ]
-
-
-    , function (err, result) {
-      res.status(200).json({ result: 'Votre avis a été pris en compte' })
-    })
+  ], function (err, result) {
+    res.status(200).json({ result: 'Votre vote a été pris en compte' })
+  })
 }
