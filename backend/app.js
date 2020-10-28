@@ -2,11 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
-
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
-
 const app = express();
+
+// Connexion à MongoDB
 mongoose.connect('mongodb+srv://bm:bm123@sopekocko.hx6se.mongodb.net/p6ocr?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -20,10 +20,13 @@ app.use((req, res, next) => {
     next();
   });
 
-  app.use(bodyParser.json());
+// Pour pouvoir utiliser les données du corps de la requête
+app.use(bodyParser.json());
 
+// Pour la gestion des images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
+// Routes API
 app.use('/api/sauces', saucesRoutes);
 app.use('/api/auth', userRoutes);
 
