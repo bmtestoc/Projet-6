@@ -5,6 +5,10 @@ const path = require('path');
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 const app = express();
+const helmet = require('helmet');
+
+// Securisation entêtes HTTP
+app.use(helmet());
 
 // Connexion à MongoDB
 mongoose.connect('mongodb+srv://bm:bm123@sopekocko.hx6se.mongodb.net/p6ocr?retryWrites=true&w=majority',
