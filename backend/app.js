@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const path = require('path');
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
@@ -9,6 +10,11 @@ const helmet = require('helmet');
 
 // Securisation entêtes HTTP
 app.use(helmet());
+
+// Active CORS pour éviter les attaques CSRF
+app.use(cors({
+  origin: 'http://localhost:4200'
+}));
 
 // Connexion à MongoDB
 mongoose.connect('mongodb+srv://bm:bm123@sopekocko.hx6se.mongodb.net/p6ocr?retryWrites=true&w=majority',
