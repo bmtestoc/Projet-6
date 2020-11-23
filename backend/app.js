@@ -17,7 +17,7 @@ app.use(cors({
 }));
 
 // Connexion à MongoDB
-mongoose.connect('mongodb+srv://pekockoAdmin:rr9vF0hqVS3mKpsK@sopekocko.hx6se.mongodb.net/p6ocr?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://login:mdp@sopekocko.hx6se.mongodb.net/p6ocr?retryWrites=true&w=majority',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true
